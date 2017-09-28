@@ -1,10 +1,9 @@
 package com.heroku.shiro;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.shiro.SecurityUtils;
@@ -21,9 +20,15 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.heroku.entity.URolePermission;
+import com.heroku.entity.URolePermissionExample;
 import com.heroku.entity.UUser;
 import com.heroku.entity.UUserExample;
+import com.heroku.entity.UUserRole;
+import com.heroku.entity.UUserRoleExample;
+import com.heroku.mapper.URolePermissionMapper;
 import com.heroku.mapper.UUserMapper;
+import com.heroku.mapper.UUserRoleMapper;
 import com.heroku.util.MyDES;
 
 public class MyShiroRealm extends AuthorizingRealm {
@@ -33,54 +38,69 @@ public class MyShiroRealm extends AuthorizingRealm {
      */
     @Autowired
     private UUserMapper uuserMapper;
+    @Autowired
+    private UUserRoleMapper uuserRoleMapper;
+    @Autowired
+    private URolePermissionMapper urolePermissionMapper;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         System.out.println("权限认证方法：MyShiroRealm.doGetAuthenticationInfo()");
 
-
-
         UUser token = (UUser) SecurityUtils.getSubject().getPrincipal();
-        Integer userId = token.getId();
-        SimpleAuthorizationInfo info =  new SimpleAuthorizationInfo();
-        //根据用户ID查询角色（role），放入到Authorization里。
-    /*Map<String, Object> map = new
-    <String, Object>();
-    map.put("user_id", userId);
-    List<SysRole> roleList = sysRoleService.selectByMap(map);
-    Set<String> roleSet = new HashSet<String>();
-    for(SysRole role : roleList){
-        roleSet.add(role.getType());
-    }*/
-        //实际开发，当前登录用户的角色和权限信息是从数据库来获取的，我这里写死是为了方便测试
-        Set<String> roleSet = new HashSet<String>();
-        roleSet.add("100002");
-        info.setRoles(roleSet);
-        //根据用户ID查询权限（permission），放入到Authorization里。
-    /*List<SysPermission> permissionList = sysPermissionService.selectByMap(map);
-    Set<String> permissionSet = new HashSet<String>();
-    for(SysPermission Permission : permissionList){
-        permissionSet.add(Permission.getName());
-    }*/
-        Set<String> permissionSet = new HashSet<String>();
-        permissionSet.add("权限添加");
-        info.setStringPermissions(permissionSet);
-        return info;
 
+		Integer userId = token.getId();
+	
+		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		// 根据用户ID查询角色（role），放入到Authorization里。
+	
+		UUserRoleExample uUserRoleExample = new UUserRoleExample();
+	
+		uUserRoleExample.createCriteria().andUidEqualTo(userId);
+		// 根据登录用户id查询该用户的角色（role）id
+
+		List<UUserRole> uUserRolelist = uuserRoleMapper.selectByExample(uUserRoleExample);
+	
+		Set<String> roleSet = new HashSet<String>();
+
+		for (UUserRole uUserRole : uUserRolelist) {
+			// logger.info(uUserRole.getRid().toString());
+			roleSet.add(uUserRole.getRid().toString());
+		}
+
+		info.setRoles(roleSet);
+		
+		// 根据用户ID查询权限（permission），放入到Authorization里。
+		
+		List<Integer> roleList = new ArrayList<Integer>();
+
+		for (String role : roleSet) {
+			roleList.add(Integer.parseInt(role));
+		}
+
+		URolePermissionExample uRolePermissionExample = new URolePermissionExample();
+		uRolePermissionExample.createCriteria().andRidIn(roleList);
+		List<URolePermission> uRolePermissionlist = urolePermissionMapper.selectByExample(uRolePermissionExample);
+
+		Set<String> permissionSet = new HashSet<String>();
+		for (URolePermission uRolePermission : uRolePermissionlist) {
+			permissionSet.add(uRolePermission.getPid().toString());
+		}
+		info.setStringPermissions(permissionSet);
+	
+		return info;
     }
-
+   
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         System.out.println("身份认证方法：MyShiroRealm.doGetAuthenticationInfo()");
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
 		String password = String.valueOf(token.getPassword());
 		
-		//密码加密查询
-	    //密码进行加密处理  明文为  password+name
-
-			String pawDES = MyDES.encryptBasedDes(password);
+	    //密码进行加密处理  
+		String pawDES = MyDES.encryptBasedDes(password);
 		
-			token.setPassword(pawDES.toCharArray());
+		token.setPassword(pawDES.toCharArray());
 			
         UUserExample exa = new UUserExample();
         exa.createCriteria().andEmailEqualTo(token.getUsername())
@@ -103,7 +123,8 @@ public class MyShiroRealm extends AuthorizingRealm {
         }else{
             //更新登录时间 last login time
             uUser.setLastLoginTime(new Date());
-            uuserMapper.updateByPrimaryKey(uUser);
+           
+           // uuserMapper.updateByPrimaryKey(uUser);
         }
         return new SimpleAuthenticationInfo(uUser, uUser.getPswd(), getName());
 

@@ -1,22 +1,142 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'db')}">
+<html xmlns:th="http://www.thymeleaf.org"
+xmlns:shiro = "http://www.pollix.at/thymeleaf/shiro"
+	th:replace="~{fragments/layout :: layout (~{::body},'db')}" 
+>
+<head>
+</head>
+<body  onLoad="playno();">
+	<form class="form-signin" action="/editsave" method="post" id="form_sign">
 
-<body>
+       <div class="form-group">
+			 <input type="hidden" id="id" name="id"
+				th:value="${user.id}" class="form-control">
+			
+		</div>
+		
+		<div class="form-group">
+			<span id="nicknamespan">用户名  ：</span>
+		
+			 <input type="text" id="nickname" name="nickname"
+				th:value="${user.nickname}" class="form-control"
+				placeholder="nickname" autofocus readonly >
+			
+		</div>
+		<div class="form-group">
+			<span id="reauth-email">邮箱  ：</span>
+			
+			 <input type="email" id="email" name="email" th:value="${user.email}"
+						class="form-control" placeholder="Email address"readonly>
+					
+		</div>
+		<div class="form-group">
+			<span>密码  ：</span> 
+			<input type="text" id="pswd" name="pswd" th:value="${user.pswd}"
+						class="form-control" placeholder="Password" readonly>
+		</div>
+		
+		<!-- <iframe name="ifm" id="ifm"  style="background-color: transparent;" marginwidth="0" marginheight="0" frameborder="0"></iframe> -->
+<div id="signature-pad" class="signature-pad">
+    <div class="signature-pad--body">
+      <canvas></canvas>
+    </div>
+    <div class="signature-pad--footer">
+      <div class="description">Sign above</div>
 
+      <div class="signature-pad--actions">
+        <div>
+          <button type="button" class="button clear" data-action="clear">Clear</button>
+          <button type="button" class="button" data-action="change-color">Change color</button>
+          <button type="button" class="button" data-action="undo">Undo</button>
+        </div>
+        <div>
+          <button type="button" class="button save" data-action="save-png">Save as PNG</button>
+          <button type="button" class="button save" data-action="save-jpg">Save as JPG</button>
+          <button type="button" class="button save" data-action="save-svg">Save as SVG</button>
+          <button id="btnplayno" type="button" class="button save" data-action="save-img">签字</button>
+         
+        </div>
+      </div>
+    </div>
+  </div>
+		<button class="btn btn-lg btn-primary btn-block btn-signin" id="save"
+			 style="display:none;" >保存</button>
+		<button type="button"  id="managerselect" class="btn btn-lg btn-primary btn-block btn-signin" shiro:hasRole="1" >管理用户信息</button>
+		<button type="button"  id="signname" class="btn btn-lg btn-primary btn-block btn-signin">显示签名板</button>
+	</form>
+<script type="text/javascript"> 
+$("#save").bind("click",function() {
 
-<div class="container">
-
-  <button class="btn"
-          id="login" type="button">test</button>
-</div>
-<script type="text/javascript">
-    $(function() {
-
-        $("#login").click(function(){
-            location.href = "/add";
-        });
-
-    });
+	var dataURL = signaturePad.toDataURL("image/jpeg");
+	var blob = dataURLToBlob(dataURL);
+	//var formData = new FormData($("#form_sign");  
+	var formData = new FormData($("#form_sign")[0]);
+	formData.append("blob", blob);
+    $.ajax({
+        url : '/jpgsave', // 自行按需配置好完整的url，包括ip和端口号  
+        type : 'POST',  
+        data : formData,  
+        async : false,  
+        cache : false,  
+        contentType : false,  
+        processData : false,  
+        success : function(returndata) {  
+            alert("success");  
+        },  
+        error : function(returndata) {  
+            alert("error");  
+          
+        }  
+    });  
+	window.location.href="/editsave";
+});
 </script>
+
+<script type="text/javascript"> 
+//点击出现修改按钮
+var test1 = document.getElementById("nickname"); 
+var test2 = document.getElementById("email"); 
+var test3 = document.getElementById("pswd"); 
+var mysubmit = document.getElementById("save"); 
+test1.ondblclick = function() 
+{ 
+ this.readOnly = false; 
+ mysubmit.style.display = ""; 
+} 
+test2.ondblclick = function() 
+{ 
+ this.readOnly = false; 
+ mysubmit.style.display = ""; 
+} 
+test3.ondblclick = function() 
+{ 
+ this.readOnly = false; 
+ mysubmit.style.display = ""; 
+} 
+mysubmit.onclick = function() 
+{ 
+ test1.readOnly = true; 
+ test2.readOnly = true; 
+ test3.readOnly = true; 
+ this.style.display = "none"; 
+} 
+//管理者按钮
+$("#managerselect").bind("click",function() {
+	window.location.href="/managerselectall";
+});
+//显示隐藏页面
+ $("#signname").bind("click",function() {
+	document.getElementById('signature-pad').style.display='block';
+});
+//隐藏页面
+function playno(){
+	document.getElementById('signature-pad').style.display='none';
+}
+</script> 
+<script src="js/signature_pad.js"></script>
+<script src="js/app.js"></script>
+<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+<script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
 </body>
+
 </html>

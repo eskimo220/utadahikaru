@@ -1,14 +1,19 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout (template, menu)">
+<html xmlns:th="http://www.thymeleaf.org" 
+
+th:fragment="layout (template, menu)">
 <head>
     <title>Java Getting Started on Heroku</title>
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
     <link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+
+
     <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
     <script th:src="@{/webjars/jquery-ui/jquery-ui.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/jquery.validate.min.js}"></script>
     <script th:src="@{/js/additional-methods.min.js}"></script>
+
 </head>
 
 <body>

@@ -1,30 +1,68 @@
 package com.heroku.controller;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.heroku.entity.URole;
 import com.heroku.entity.UUser;
 import com.heroku.entity.UUserExample;
+import com.heroku.entity.UUserRole;
 import com.heroku.form.LoginForm;
 import com.heroku.mapper.UUserMapper;
+import com.heroku.mapper.UUserRoleMapper;
+import com.heroku.util.Jwt;
 import com.heroku.util.MyDES;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+
 
 @Controller
 public class UserVaildContreller {
+	
+	@Value("${spring.sendgrid.api-key}")
+    private String apiKey;
+	
 	@Autowired
 	UUserMapper umaper ;
+	@Autowired
+	UUserRoleMapper uuserRoleMapper;
+	
+	/**
+	 * 存放上传的图片信息
+	 */
+	private static Map<String,byte[]> images;
+	
+	static {
+		images = new HashMap<String, byte[]>();
+	}
 
     @RequestMapping("/")
     String index() {
@@ -44,12 +82,20 @@ public class UserVaildContreller {
     String addsuccess() {
         return "addsuccess";
     }
-    
-    @RequestMapping("db")
-    String db() {
-        return "db";
+ 
+    @RequestMapping("JwtSuccess")
+    String JwtSuccess() {
+        return "JwtSuccess";
     }
-
+    @RequestMapping("JwtFail")
+    String JwtFail() {
+        return "JwtFail";
+    }
+    @RequestMapping("forgotpwd")
+    String forgotpwd() {
+        return "forgotpwd";
+    }
+    
     /**
      * ajax登录请求
      * @param loginForm
@@ -74,7 +120,7 @@ public class UserVaildContreller {
         //session.removeAttribute("_come");
         if(!vcode.equals(v)){
             resultMap.put("status", 500);
-            resultMap.put("message", "验证码错误！");
+            resultMap.put("message", "验证码错误！"); 
             return resultMap;
         }*/
 
@@ -102,6 +148,7 @@ public class UserVaildContreller {
 		Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
 		try {
 			//退出
+			
 			SecurityUtils.getSubject().logout();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -110,15 +157,50 @@ public class UserVaildContreller {
 	}
 
 	/**
-	 * 添加
+	 * 校验是否激活邮箱
+	 * @return
+	 */
+	@RequestMapping(value = "Jwt")
+	
+	public String Jwt(@RequestParam String token) {
+		//首先确认token是否有效
+
+	    //解密令牌，取出user对象
+		UUser uuser = Jwt.unsign(token, UUser.class);
+	
+		UUserExample userexample = new UUserExample();
+		
+		//根据Email，查出该user的其他信息（id），方便update
+		userexample.createCriteria().andNicknameEqualTo(uuser.getNickname());
+		List<UUser> users=umaper.selectByExample(userexample);
+		
+		//获得该uuser的本身
+		UUser uUser=users.get(0);
+		//将他的Status赋值为1
+		uUser.setStatus((short) 1);
+		
+      if(token.equals(uUser.getTokens())){
+		//String tokenn = Jwt.sign(uUser, 60L* 1000L* 30L);
+		uUser.setTokens(token+"aa");
+		umaper.updateByPrimaryKeySelective(uUser);
+		return "/JwtSuccess";
+      }else{
+	    return "/JwtFail";
+      }
+	}
+	
+	/**
+	 *  注册,用户权限默认设置为persion
 	 * @return
 	 */
 		@RequestMapping(value = "adduser")
 	
-		public String add(AuthenticationToken authenticationToken,UUser user,Model model) {
-		UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;	
-		UUserExample exa = new UUserExample();
+		public String add(UUser user,URole urole,Model model) {
+		//权限id绑定
+		UUserRole uuserRole = new UUserRole();
 		
+	    //令牌(对象是页面添加信息的user对象与半小时约定失效时间)
+	    String token = Jwt.sign(user, 60L* 1000L* 30L);
 	    //密码加密
 		String password = String.valueOf(user.getPswd());	
 	
@@ -126,45 +208,201 @@ public class UserVaildContreller {
 		
 		user.setPswd(pawDES);
 		
-		//创建时间应当获取当前的时间
-		
+		//创建时间-获取当前的时间
 	    user.setCreateTime(new Date());
 	    
-		//确认此账号是否唯一
-	    exa.createCriteria().andNicknameEqualTo(token.getUsername());
-	    if(umaper.selectByExample(exa).size()!=0){
-	    	return "false";
-	    }else{
+	    //创建token用于用户一次验证
+	    user.setTokens(token);
+	    System.out.println(user.getId());
+
+
+	  
+	    //发送邮件
+	    try {
+  	      SendGrid sg = new SendGrid(apiKey);
+  	      Request request = new Request();
+  	      request.setMethod(Method.POST);
+  	      request.setEndpoint("mail/send");
+  	      request.setBody("{\"personalizations\":[{\"to\":[{\"email\":\"" + user.getEmail() + "\"}],\"subject\":\"你中了200万!\"}],\"from\":{\"email\":\"lilu@qq.com\"},\"content\":[{\"type\":\"text/plain\",\"value\": \"路哥又来信了!还带来了一个链接http://127.0.0.1:5000/Jwt?token=" + token + "\"}]}");
+  	  
+  	      //long starTime=System.currentTimeMillis();
+  	      Response response = sg.api(request);
+  	      //System.out.println(System.currentTimeMillis() - starTime+"@#$");
+  	      System.out.println(response.getStatusCode());
+  	      System.out.println(response.getBody());
+  	      System.out.println(response.getHeaders());
+  	    } catch (IOException ex) {
+  	      try {
+				throw ex;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+  	    }
+	    
+	    //插入此数据
 			if (umaper.insertSelective(user)==1) {
+				UUserExample userexample = new UUserExample();
+				userexample.createCriteria().andNicknameEqualTo(user.getNickname()).andEmailEqualTo(user.getEmail());
+				List<UUser> users=umaper.selectByExample(userexample);
+				
+				//获得该uuser的本身
+				UUser uUser=users.get(0);
+				uuserRole.setRid(2);
+				uuserRole.setUid(uUser.getId());;
+				uuserRoleMapper.insert(uuserRole);
+				
 				return "/addsuccess";
 			} else {
 				return "/add";
 			}
-		}
-		}
-
-
-		/**
-		 * 保持唯一
-		 * @return
-		 */
-			@RequestMapping(value = "oneuser")
 		
-			public @ResponseBody boolean oneuser(UUser user,Model model) {
-//			Map<String, Object> resultMap = new LinkedHashMap<String, Object>();	
+		}
+
+	/**
+	  * 保持唯一用户名
+	  * @return
+	  */
+		@RequestMapping(value = "oneuser")
+		
+		public @ResponseBody boolean oneuser(UUser user,Model model) {
+//		Map<String, Object> resultMap = new LinkedHashMap<String, Object>();	
 				
-			UUserExample exa = new UUserExample();
+		UUserExample exa = new UUserExample();
 			
-			//确认此账号是否唯一
-		    exa.createCriteria().andNicknameEqualTo(user.getNickname());
-//		    if(umaper.selectByExample(exa).size()!=0){
-//		    	 resultMap.put("sa", false);
-//		    	 return resultMap;
-//		    }else{
-//		    	resultMap.put("sa", true);
-//			    return resultMap;
-//			}
-		    return umaper.selectByExample(exa).size()==0;
+		//确认此账号是否唯一
+		exa.createCriteria().andNicknameEqualTo(user.getNickname());
+
+		return umaper.selectByExample(exa).size()==0;
 		    
-			}			
+		}	
+			
+	/**
+	  * 忘记密码，发送邮件确认用户信息
+	  * @return
+	 */	
+		@RequestMapping(value = "sendforgotemail")	
+		public String sendforgotemail(UUser user,Model model) {
+		
+		//首先确认该邮箱的正确性	
+		UUserExample emailexa = new UUserExample();
+		emailexa.createCriteria().andEmailEqualTo(user.getEmail());
+		List<UUser> uUsers=umaper.selectByExample(emailexa);
+		UUser uUser = null;
+		if(uUsers.size()==0){
+            //提示用户，该邮箱没有注册过
+			 return "/forgotpwd";
+		}else{
+        //密码解密后发送给用户
+			uUser = uUsers.get(0);
+			String password = String.valueOf(uUser.getPswd());	
+			String pawDES = MyDES.decryptBasedDes(password);
+			uUser.setPswd(pawDES);
+		  try {
+			  SendGrid sg = new SendGrid(apiKey);
+			  Request request = new Request();
+			  request.setMethod(Method.POST);
+			  request.setEndpoint("mail/send");
+			  request.setBody("{\"personalizations\":[{\"to\":[{\"email\":\"" + user.getEmail() + "\"}],\"subject\":\"已经查到您的信息!\"}],\"from\":{\"email\":\"lilu@qq.com\"},\"content\":[{\"type\":\"text/plain\",\"value\": \"路哥又来信了!您的密码=" + uUser.getPswd() + "用户名=" + uUser.getNickname() + "\"}]}");
+			  	  
+			  //long starTime=System.currentTimeMillis();
+			  Response response = sg.api(request);
+			  //System.out.println(System.currentTimeMillis() - starTime+"@#$");
+			  System.out.println(response.getStatusCode());
+			  System.out.println(response.getBody());
+			  System.out.println(response.getHeaders());
+	       } catch (IOException ex) {
+			try {
+			   throw ex;
+			} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			}
+		  }
+			return "login";
+		}
+		
+	}
+			
+
+	/**
+	  * 根据用户提供的邮箱，查找返回该用户的信息(用于修改)
+	  * @return
+	  */	
+	@RequestMapping("db")
+	public String db(Model model,String email) {
+	    //设置密码与邮件参数，查询返回
+
+		UUserExample emailexa = new UUserExample();
+		emailexa.createCriteria().andEmailEqualTo(email);
+		List<UUser> uUsers=umaper.selectByExample(emailexa);
+		UUser user =uUsers.get(0);
+		String password = String.valueOf(user.getPswd());	
+		
+		String pawDES = MyDES.decryptBasedDes(password);
+		
+		user.setPswd(pawDES);
+		model.addAttribute("user", user);
+	   return "db";
+}
+
+	
+	/**
+	  * admin管理用户查看页面
+	  * @return
+	  */	
+	@RequestMapping("managerselectall")
+	public String managerselectall(UUser user,Model model){
+		UUserExample emailexa = new UUserExample();
+		List<UUser> uUserlist = umaper.selectByExample(emailexa);
+		System.out.println(uUserlist);
+		model.addAttribute("uUserlist", uUserlist);
+		return "managerselect";
+	}
+	
+
+	/**
+	  * 保存用户信息
+	  * @return
+	  */
+	@RequestMapping("editsave")		
+	public String editsave(UUser user,Model model){
+		String password = String.valueOf(user.getPswd());	
+		String pawDES = MyDES.encryptBasedDes(password);
+		user.setPswd(pawDES);
+		UUserExample emailexa = new UUserExample();
+		emailexa.createCriteria().andIdEqualTo(user.getId());
+		umaper.updateByExampleSelective(user, emailexa);
+		
+		return "editsuccess";
+	}
+	
+	/**
+	  * 保存图片数据库
+	  * @return
+	 * @throws IOException 
+	  */
+	@RequestMapping("jpgsave")		
+	public @ResponseBody Map<String,Object> jpgsave(@RequestParam("blob") MultipartFile[] submissions,UUser user) throws IOException{
+		
+		Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
+	       
+		if(submissions.length > 0)
+		{
+			MultipartFile file = submissions[0];
+			if (file != null) {  
+                file.transferTo(new File("C://aaa.jpeg"));// 可以获取到图片的字节数组
+               // Object obj = null;
+                byte[] images = file.getBytes();
+         
+                user.setLongblob(images);
+                UUserExample emailexa = new UUserExample();
+        		emailexa.createCriteria().andIdEqualTo(user.getId());
+        		umaper.updateByExampleSelective(user, emailexa);
+       //  images.put(file.getName(),file.getBytes());// 获取到图片以字节数组形式保存在服务器内存中  
+            }  
+		}
+	        return resultMap;
+	}
+	
 }

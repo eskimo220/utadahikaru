@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'注册')}">
+<head>
+<meta charset="UTF-8">
+<title>addsuccess</title>
+</head>
+<body>
+<h1>唉，您激活失败了，大概是可以激活的时间过了（半小时）</h1>
+<button class="btn btn-white" type="button" id="Back"
+data-type="url">返回登录页面</button>
+<script type="text/javascript">
+	//返回
+   $("#Back").bind("click",function() {
+		window.location.href="/login";
+	});
+ 
+</script>
+</body>
+</html>

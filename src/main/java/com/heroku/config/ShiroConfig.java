@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -19,6 +20,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.heroku.shiro.MyShiroRealm;
+
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 
 @Configuration
 public class ShiroConfig {
@@ -62,12 +65,23 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/ajaxLogin", "anon");
         filterChainDefinitionMap.put("/addsuccess", "anon");
         filterChainDefinitionMap.put("/adduser", "anon");
+        filterChainDefinitionMap.put("/forgotpwd", "anon");
+        filterChainDefinitionMap.put("/sendforgotemail", "anon");
+        filterChainDefinitionMap.put("/editsave", "anon");
+        filterChainDefinitionMap.put("/editsuccess", "authc");
+        filterChainDefinitionMap.put("/managerselectall", "perms[1]");
+        filterChainDefinitionMap.put("/managerselect", "perms[1]");
+    
+        filterChainDefinitionMap.put("/jpgsave", "anon");
         // 配置退出过滤器,其中的具体的退出代码Shiro已经替我们实现了
         filterChainDefinitionMap.put("/logout", "logout");
         filterChainDefinitionMap.put("/login", "anon");
         filterChainDefinitionMap.put("/add", "anon");
         filterChainDefinitionMap.put("/oneuser", "anon");
-        filterChainDefinitionMap.put("/db", "perms[权限添加]");
+        filterChainDefinitionMap.put("/Jwt", "anon");
+        filterChainDefinitionMap.put("/JwtSuccess", "anon");
+        filterChainDefinitionMap.put("/JwtFail", "anon");
+        filterChainDefinitionMap.put("/db", "perms[1]");
         // <!-- 过滤链定义，从上向下顺序执行，一般将 /**放在最为下边 -->:这是一个坑呢，一不小心代码就不好使了;
         // <!-- authc:所有url都必须认证通过才可以访问; anon:所有url都都可以匿名访问-->
         filterChainDefinitionMap.put("/**", "authc");
@@ -182,5 +196,11 @@ public class ShiroConfig {
        //rememberMe cookie加密的密钥 建议每个项目都不一样 默认AES算法 密钥长度(128 256 512 位)
        cookieRememberMeManager.setCipherKey(Base64.decode("3AvVhmFLUs0KTA3Kprsdag=="));
        return cookieRememberMeManager;
+    }
+    
+    /** * 添加ShiroDialect 为了在thymeleaf里使用shiro的标签的bean * @return */
+    @Bean(name = "shiroDialect")
+    public ShiroDialect shiroDialect(){
+        return new ShiroDialect();
     }
 }

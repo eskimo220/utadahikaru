@@ -6,7 +6,9 @@
     you can substitue the span of reauth email for a input with the email and
     include the remember me checkbox
     -->
+    
 	<div class="container">
+	
 		<div class="card card-container">
 			<!-- <img class="profile-img-card" src="//lh3.googleusercontent.com/-6V8xOA6M7BA/AAAAAAAAAAI/AAAAAAAAAAA/rzlHcD0KYwo/photo.jpg?sz=120" alt="" /> -->
 			<img id="profile-img" class="profile-img-card"
@@ -32,14 +34,13 @@
 					id="login" type="submit">Sign in</button>
 			</form>
 			<!-- /form -->
-			<a href="#" class="forgot-password"> Forgot the password? </a>
-			<button id="btnAdd" type="button" class="btn btn-primary "
-						onclick="addModel()">Add</button>
+			<a href="/forgotpwd" class="forgot-password"> Forgot the password? </a>
+			<a href="/add" class="Sign-up"> Sign Up? </a>
 		</div>
 		<!-- /card-container -->
 	</div>
 	<!-- /container -->
-	<script type="text/javascript">
+	<script type="text/javascript"> 
 		$(function() {
 
 			$('form').validate({
@@ -85,8 +86,9 @@
                             rememberMe : $("#rememberMe").is(':checked')
 						}),
 						success : function(data) {
+					
 							alert(data.message);
-                            data.status == "200" && window.open("/db", "_self")
+                            data.status == "200" && window.open("/db?email="+$("#inputEmail").val(), "_self")
 						}
 					});
 					return false;
@@ -94,10 +96,7 @@
 			});
 
 		});
-		function addModel() {
-			$("#btnAdd").button("loading");
-			location.href = "/add";
-		}
+	
 	</script>
 </body>
 </html>

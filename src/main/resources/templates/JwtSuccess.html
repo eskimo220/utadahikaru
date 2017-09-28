@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'注册')}">
+<head>
+<meta charset="UTF-8">
+<title>addsuccess</title>
+</head>
+<body>
+<h1>已经验证成功了，你还想要怎样!</h1>
+<button class="btn btn-white" type="button" id="Back"
+data-type="url">返回登录页面</button>
+<script type="text/javascript">
+	//返回
+   $("#Back").bind("click",function() {
+		window.location.href="/login";
+	});
+ 
+</script>
+</body>
+</html>

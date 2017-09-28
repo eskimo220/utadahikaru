@@ -5,11 +5,11 @@
 
 <generatorConfiguration>
     <classPathEntry
-            location="~/.m2/repository/org/postgresql/postgresql/9.4.1212/postgresql-9.4.1212.jar"/>
+            location="C:/Users/Administrator/.m2/repository/org/postgresql/postgresql/9.4.1212/postgresql-9.4.1212.jar"/>
     <context id="my" targetRuntime="MyBatis3">
 
         <jdbcConnection driverClass="org.postgresql.Driver"
-                        connectionURL="jdbc:postgresql://ec2-50-19-83-146.compute-1.amazonaws.com:5432/dv5fmed0096r?user=rsprdbbiqnaqig&amp;password=e65600294b31b54ff89be3e2efa3b8931a95b10add553ceed3845ee2c8728a19&amp;sslmode=require" />
+                        connectionURL="jdbc:postgresql://127.0.0.1:5432/mydb?user=postgres&amp;password=lilu" />
 
         <javaModelGenerator targetPackage="com.heroku.entity"
                             targetProject="src/main/java/">
