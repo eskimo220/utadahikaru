@@ -50,26 +50,21 @@ xmlns:shiro = "http://www.pollix.at/thymeleaf/shiro"
           <button type="button" class="button" data-action="undo">Undo</button>
         </div>
         <div>
-          <button type="button" class="button save" data-action="save-png">Save as PNG</button>
-          <button type="button" class="button save" data-action="save-jpg">Save as JPG</button>
-          <button type="button" class="button save" data-action="save-svg">Save as SVG</button>
+        
           <button id="btnplayno" type="button" class="button save" data-action="save-img">签字</button>
          
         </div>
       </div>
     </div>
   </div>
-		<button class="btn btn-lg btn-primary btn-block btn-signin" id="save"
-			 style="display:none;" >保存</button>
+		<button class="btn btn-lg btn-primary btn-block btn-signin" id="save" style="display:none;" >保存</button>
 		<button type="button"  id="managerselect" class="btn btn-lg btn-primary btn-block btn-signin" shiro:hasRole="1" >管理用户信息</button>
 		<button type="button"  id="signname" class="btn btn-lg btn-primary btn-block btn-signin">显示签名板</button>
 	</form>
 <script type="text/javascript"> 
 $("#save").bind("click",function() {
-
 	var dataURL = signaturePad.toDataURL("image/jpeg");
 	var blob = dataURLToBlob(dataURL);
-	//var formData = new FormData($("#form_sign");  
 	var formData = new FormData($("#form_sign")[0]);
 	formData.append("blob", blob);
     $.ajax({
@@ -85,7 +80,6 @@ $("#save").bind("click",function() {
         },  
         error : function(returndata) {  
             alert("error");  
-          
         }  
     });  
 	window.location.href="/editsave";

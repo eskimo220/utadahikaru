@@ -5,8 +5,24 @@
 <title>editsuccess</title>
 </head>
 <body>
+
+  
 <h1>恭喜你，已经修改成功,还有您的签名</h1>
 
-<Button >显示签名</Button>
+      <div class="form-group">
+			<span id="nicknamespan">用户名  ：</span>
+		
+			 <input type="text" id="nickname" name="nickname"
+				th:value="${user.nickname}" class="form-control"
+				placeholder="nickname"  readonly >
+		</div>
+		
+		
+<!-- <img id="img" th:src="@{showimg?nickname={nickname}(nickname=${user.nickname})}  "  alt="签名"> -->
+<!-- <img th:src="@{data:image/jpeg|png|gif;base64,{data}(data=${data})}"/> -->
+<img th:src="@{'data:image/jpeg|png|gif;base64,'+${data}}"/>
+
+<Button id="showbtn" onclick="showimg()">显示签名</Button>
+
 </body>
 </html>

@@ -71,7 +71,9 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/editsuccess", "authc");
         filterChainDefinitionMap.put("/managerselectall", "perms[1]");
         filterChainDefinitionMap.put("/managerselect", "perms[1]");
-    
+        filterChainDefinitionMap.put("/showimg", "anon");
+
+        
         filterChainDefinitionMap.put("/jpgsave", "anon");
         // 配置退出过滤器,其中的具体的退出代码Shiro已经替我们实现了
         filterChainDefinitionMap.put("/logout", "logout");

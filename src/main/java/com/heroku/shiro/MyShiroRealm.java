@@ -122,9 +122,10 @@ public class MyShiroRealm extends AuthorizingRealm {
             throw new DisabledAccountException("帐号已经禁止登录！");
         }else{
             //更新登录时间 last login time
-            uUser.setLastLoginTime(new Date());
-           
-           // uuserMapper.updateByPrimaryKey(uUser);
+           /* uUser.setLastLoginTime(new Date());
+            uuserMapper.updateByPrimaryKey(uUser);*/
+        	exa.createCriteria().andLastLoginTimeEqualTo(new Date());
+            uuserMapper.updateByExampleSelective(uUser, exa);
         }
         return new SimpleAuthenticationInfo(uUser, uUser.getPswd(), getName());
 

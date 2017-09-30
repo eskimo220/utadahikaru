@@ -4,17 +4,16 @@ package com.heroku.controller;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +26,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.heroku.entity.Imgsave;
 import com.heroku.entity.URole;
 import com.heroku.entity.UUser;
 import com.heroku.entity.UUserExample;
 import com.heroku.entity.UUserRole;
 import com.heroku.form.LoginForm;
+import com.heroku.mapper.ImgsaveMapper;
 import com.heroku.mapper.UUserMapper;
 import com.heroku.mapper.UUserRoleMapper;
 import com.heroku.util.Jwt;
@@ -54,15 +54,8 @@ public class UserVaildContreller {
 	UUserMapper umaper ;
 	@Autowired
 	UUserRoleMapper uuserRoleMapper;
-	
-	/**
-	 * 存放上传的图片信息
-	 */
-	private static Map<String,byte[]> images;
-	
-	static {
-		images = new HashMap<String, byte[]>();
-	}
+	@Autowired
+	ImgsaveMapper imgsaveMapper;
 
     @RequestMapping("/")
     String index() {
@@ -215,8 +208,6 @@ public class UserVaildContreller {
 	    user.setTokens(token);
 	    System.out.println(user.getId());
 
-
-	  
 	    //发送邮件
 	    try {
   	      SendGrid sg = new SendGrid(apiKey);
@@ -343,7 +334,7 @@ public class UserVaildContreller {
 		
 		user.setPswd(pawDES);
 		model.addAttribute("user", user);
-	   return "db";
+	    return "db";
 }
 
 	
@@ -367,12 +358,23 @@ public class UserVaildContreller {
 	  */
 	@RequestMapping("editsave")		
 	public String editsave(UUser user,Model model){
+		
 		String password = String.valueOf(user.getPswd());	
 		String pawDES = MyDES.encryptBasedDes(password);
 		user.setPswd(pawDES);
 		UUserExample emailexa = new UUserExample();
 		emailexa.createCriteria().andIdEqualTo(user.getId());
 		umaper.updateByExampleSelective(user, emailexa);
+		//从session取出user信息（前面有存储），赋值到user前台可用
+		model.addAttribute("user", SecurityUtils.getSubject().getPrincipal());
+		
+		Imgsave imgsave = imgsaveMapper.selectByPrimaryKey(user.getNickname());
+        
+        byte[] databyte = imgsave.getLongblob();
+		
+        String data = Base64.encodeBase64String(databyte); 
+        System.out.println("@@"+data);
+        model.addAttribute("data",data);
 		
 		return "editsuccess";
 	}
@@ -391,18 +393,48 @@ public class UserVaildContreller {
 		{
 			MultipartFile file = submissions[0];
 			if (file != null) {  
-                file.transferTo(new File("C://aaa.jpeg"));// 可以获取到图片的字节数组
-               // Object obj = null;
-                byte[] images = file.getBytes();
-         
-                user.setLongblob(images);
-                UUserExample emailexa = new UUserExample();
-        		emailexa.createCriteria().andIdEqualTo(user.getId());
-        		umaper.updateByExampleSelective(user, emailexa);
-       //  images.put(file.getName(),file.getBytes());// 获取到图片以字节数组形式保存在服务器内存中  
+                file.transferTo(new File("C://aaa.jpeg"));// 上传服务器
+                //使用转byte[]存入数据库
+                byte[] images = file.getBytes();                     
+                Imgsave imgsave = new Imgsave();
+                imgsave.setUsername(user.getNickname());
+                imgsave.setLongblob(images);
+                imgsaveMapper.insert(imgsave);
+                
+                //使用base64转码     
+                /*// 通过base64来转化图片  
+                String data = Base64.encodeBase64String(file.getBytes()); 
+                Imgsave imgsave = new Imgsave();
+                imgsave.setUsername(user.getNickname());
+                imgsave.setLongblob(data);*/
             }  
 		}
 	        return resultMap;
 	}
+	
+	/**
+	  * online文件流显示图片
+	  * @return
+	  */
+	@RequestMapping("showimg")		
+	public void showimg(@RequestParam String nickname,HttpServletResponse response)throws IOException{
+  	    int len = 0;  
+	    byte[] buf = new byte[1024]; 
+		
+        response.setContentType("image/jpeg");  
+        response.setCharacterEncoding("UTF-8");
+        
+        Imgsave imgsave = imgsaveMapper.selectByPrimaryKey(nickname);
+        
+        byte[] data = imgsave.getLongblob();
+        OutputStream  ops = response.getOutputStream(); 
+        InputStream in = new ByteArrayInputStream(data);
+        
+        while ((len = in.read(buf, 0, 1024)) != -1) {  
+        	ops.write(buf, 0, len);  
+        }  
+        ops.close();  
+	}	
+	
 	
 }
