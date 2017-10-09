@@ -365,6 +365,7 @@ public class UserVaildContreller {
 		UUserExample emailexa = new UUserExample();
 		emailexa.createCriteria().andIdEqualTo(user.getId());
 		umaper.updateByExampleSelective(user, emailexa);
+		
 		//从session取出user信息（前面有存储），赋值到user前台可用
 		model.addAttribute("user", SecurityUtils.getSubject().getPrincipal());
 		
