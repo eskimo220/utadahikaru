@@ -247,7 +247,6 @@ public class UserVaildContreller {
 			} else {
 				return "/add";
 			}
-		
 		}
 
 	/**
@@ -374,7 +373,6 @@ public class UserVaildContreller {
         byte[] databyte = imgsave.getLongblob();
 		
         String data = Base64.encodeBase64String(databyte); 
-        System.out.println("@@"+data);
         model.addAttribute("data",data);
 		
 		return "editsuccess";
@@ -401,20 +399,13 @@ public class UserVaildContreller {
                 imgsave.setUsername(user.getNickname());
                 imgsave.setLongblob(images);
                 imgsaveMapper.insert(imgsave);
-                
-                //使用base64转码     
-                /*// 通过base64来转化图片  
-                String data = Base64.encodeBase64String(file.getBytes()); 
-                Imgsave imgsave = new Imgsave();
-                imgsave.setUsername(user.getNickname());
-                imgsave.setLongblob(data);*/
             }  
 		}
 	        return resultMap;
 	}
 	
 	/**
-	  * online文件流显示图片
+	  * online文件流显示图片（暂时不需要）
 	  * @return
 	  */
 	@RequestMapping("showimg")		

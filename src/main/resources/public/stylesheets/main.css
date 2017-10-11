@@ -166,3 +166,37 @@ body, html {
 .forgot-password:focus{
     color: rgb(12, 97, 33);
 }
+
+.signature-pad{
+	display:block;
+	width:30%;
+	height:40%;
+	z-index:99999;
+	position:fixed;
+	top:25%;
+	left:30%;
+	border:solider 1px #OEA9BF;
+}
+.cover{
+	position:fixed;
+	z-index:9999;
+	top:0px;
+	left:0px;
+
+	width:100%;
+	height:100%;
+	opacity:0.5;
+	background:#000 none repeat scroll 0% 0%;
+}
+
+
+
+
+
+
+
+
+
+
+
+

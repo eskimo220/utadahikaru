@@ -59,14 +59,13 @@ function download2(dataURL, filename) {
 	  var img = document.createElement("img");
 	  img.src = dataURL;
 	  img.id = "imgid";
+	  var div1=document.getElementById('div1');
 
-	  var v = document.getElementById("imgid");
-      if(v != null){
- 		document.body.removeChild(v);
- 	  }
-      document.body.appendChild(img);	
- 	  //document.getElementById("imgid").src="dataURL";
-	  // document.body.removeChild(img);
+	  while(div1.hasChildNodes())
+	    {
+	        div1.removeChild(div1.firstChild);
+	    } 
+      div1.appendChild(img);
 	  document.getElementById('signature-pad').style.display='none';
   
 	}
