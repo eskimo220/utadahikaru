@@ -34,7 +34,7 @@
 body, html {
     height: 100%;
     background-repeat: no-repeat;
-    background-image: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33));
+   /*  background-image: linear-gradient(rgb(104, 145, 162), rgb(12, 97, 33)); */
 }
 
 .card-container.card {
@@ -116,7 +116,7 @@ body, html {
 .form-signin input[type=password],
 .form-signin input[type=text],
 .form-signin button {
-    width: 100%;
+   /*  width: 100%; */
     display: block;
     margin-bottom: 10px;
     z-index: 1;
@@ -170,7 +170,7 @@ body, html {
 .signature-pad{
 	display:block;
 	width:30%;
-	height:40%;
+	height:20%;
 	z-index:99999;
 	position:fixed;
 	top:25%;
@@ -188,10 +188,21 @@ body, html {
 	opacity:0.5;
 	background:#000 none repeat scroll 0% 0%;
 }
-
-
-
-
+.bgblock{
+	height:50%;
+	background:#f5f5f5 none repeat scroll 0% 0%;
+}
+ 
+.sign-name{
+	float:left;
+}
+.signname{
+	float:left;
+}
+.div1{
+	float:right;
+} 
+ 
 
 
 

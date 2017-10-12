@@ -59,6 +59,7 @@ function download2(dataURL, filename) {
 	  var img = document.createElement("img");
 	  img.src = dataURL;
 	  img.id = "imgid";
+	  
 	  var div1=document.getElementById('div1');
 
 	  while(div1.hasChildNodes())
@@ -66,9 +67,19 @@ function download2(dataURL, filename) {
 	        div1.removeChild(div1.firstChild);
 	    } 
       div1.appendChild(img);
+      $(img).after('<button type="button" class="close" onclick="closebtn()";><span aria-hidden="true">&times;</span></button>');
 	  document.getElementById('signature-pad').style.display='none';
   
 	}
+
+function closebtn(){
+	var div1=document.getElementById('div1');
+	while(div1.hasChildNodes())
+    {
+        div1.removeChild(div1.firstChild);
+    } 
+}
+
 
 // One could simply use Canvas#toBlob method instead, but it's just to show
 // that it can be done using result of SignaturePad#toDataURL.
@@ -100,7 +111,7 @@ undoButton.addEventListener("click", function (event) {
   }
 });
 
-changeColorButton.addEventListener("click", function (event) {
+changeColorButton && changeColorButton.addEventListener("click", function (event) {
   var r = Math.round(Math.random() * 255);
   var g = Math.round(Math.random() * 255);
   var b = Math.round(Math.random() * 255);
