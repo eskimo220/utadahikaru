@@ -68,7 +68,7 @@ function download2(dataURL, filename) {
 	    } 
       div1.appendChild(img);
       $(img).after('<button type="button" class="close" onclick="closebtn()";><span aria-hidden="true">&times;</span></button>');
-	  document.getElementById('signature-pad').style.display='none';
+	  $(".signature-pad-parent").hide();
   
 	}
 

@@ -57,9 +57,10 @@ xmlns:shiro = "http://www.pollix.at/thymeleaf/shiro"
 		
 		
 		<!-- 签名框在此，先隐藏 -->
+		<div class="signature-pad-parent">
 <div id="signature-pad" class="signature-pad text-center">
-    <div >
-      <canvas width="600" height="125" id="canvas"></canvas>
+   <div class="signature-pad--body">
+      <canvas ></canvas>
     </div>
     <div class="signature-pad--footer">
       
@@ -73,11 +74,13 @@ xmlns:shiro = "http://www.pollix.at/thymeleaf/shiro"
           <a id="btnclear" data-action="clear">Clear</a>
           <a id="btnundo" data-action="undo">Undo</a>
           <a id="btnplayno" data-action="save-img">SignName</a>
-          <input type="file" id="file_input" />
         </div>
- 
+       
+          
+       
       </div>
     </div>
+</div>
 </div>
 		<button class="btn btn-lg btn-primary btn-block btn-signin" id="save" style="display:none;" >保存</button>
 		<button type="button"  id="managerselect" class="btn btn-lg btn-primary btn-block btn-signin" shiro:hasRole="1" >管理用户信息</button>
@@ -143,54 +146,22 @@ $("#managerselect").bind("click",function() {
 
 //页面加载先隐藏幕布和签名板
 $(document).ready(function(){
-	$(".signature-pad").hide();
+	$(".signature-pad-parent").hide();
 	$(".cover").hide();
 	$(".cover").click(function(){
-		$(".signature-pad").hide();
+		$(".signature-pad-parent").hide();
 		$(this).hide();
 	});
 })
 //点击后两个显示
 $("#signname").bind("click",function() {
-	$(".signature-pad").show();
+	$(".signature-pad-parent").show();
 	$(".cover").show();
 });
 //签字后隐藏幕布
 $("#btnplayno").bind("click",function() {
 	$(".cover").hide();
 });
-
-var input = document.getElementById("file_input");
-
-if(typeof FileReader === 'undefined') {
-	result.innerHTML = "抱歉，你的浏览器不支持 FileReader";
-	input.setAttribute('disabled', 'disabled');
-} else {
-	input.addEventListener('change', readFile, false);
-}
-
-function readFile() {
-	var file = this.files[0];
-	if(!/image\/\w+/.test(file.type)) {
-		alert("请确保文件为图像类型");
-		return false;
-	}
-	var reader = new FileReader();
-	reader.readAsDataURL(file);
-	reader.onload = function(e) {
-		var oC = document.getElementById('canvas');
-		var oGC = oC.getContext('2d');
-		var yImg = new Image();
-		yImg.onload = function() {
-			draw(this);
-		};
-		yImg.src = this.result;
-
-		function draw(obj) {
-			oGC.drawImage(obj, 0, 0);
-		}
-	}
-}
 
 
 </script> 
