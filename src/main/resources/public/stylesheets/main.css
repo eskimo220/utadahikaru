@@ -112,11 +112,11 @@ body, html {
     font-size: 16px;
 }
 
-.form-signin input[type=email],
+/* .form-signin input[type=email],
 .form-signin input[type=password],
 .form-signin input[type=text],
 .form-signin {
-   /*  width: 100%; */
+    width: 100%;
     display: block;
     margin-bottom: 10px;
     z-index: 1;
@@ -125,7 +125,7 @@ body, html {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-
+ */
 .form-signin .form-control:focus {
     border-color: rgb(104, 145, 162);
     outline: 0;
@@ -193,7 +193,7 @@ display:none;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  z-index:99999;
+  z-index:300;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -217,9 +217,9 @@ display:none;
 
 .signature-pad-parent{
 	border:solider 1px #OEA9BF;
-	z-index:9999;
+	z-index:200;
 	position: fixed;
-	display:none;
+
 	 
  top: 50%;
 left: 50%;

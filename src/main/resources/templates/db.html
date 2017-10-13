@@ -40,7 +40,13 @@
 				<tr class="form-group" style="height: 125px">
 					<td>
 
-						<div class="col-xs-2">
+						
+
+					</td>
+				</tr>
+			</table>
+			<div class="row">
+			<div class="col-xs-2">
 							<span id="sign-name">SIGN </span>
 						</div>
 						<div class="col-xs-3" style="height: 125px">
@@ -51,14 +57,12 @@
 							<div id="div1" class="div1"></div>
 							<!-- <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button> -->
 						</div>
-
-					</td>
-				</tr>
-			</table>
+			</div>
+			
 		</div>
 
 		<!-- 签名框在此，先隐藏 -->
-		<div id="signature-pad-parent" class="signature-pad-parent" >
+		<div id="signature-pad-parent" class="signature-pad-parent" style="display:none;">
 			<div id="signature-pad" class="signature-pad text-center">
 				<div class="signature-pad--body">
 					<canvas></canvas>
@@ -155,11 +159,12 @@
 	
 		//点击后两个显示
 		$("#signname").bind("click", function() {
-			document.getElementById('cover').style.display='block';
+/* 			document.getElementById('cover').style.display='block';
 			document.getElementById('signature-pad-parent').style.display='block';
+			 */
+			$(".cover").show();
+			$(".signature-pad-parent").show().resize();
 			
-			/*  $(".cover").show();
-			$(".signature-pad-parent").show();  */
 		});
 		
 		//签字后隐藏幕布
