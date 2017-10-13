@@ -60,6 +60,9 @@ function download2(dataURL, filename) {
 	  img.src = dataURL;
 	  img.id = "imgid";
 	  
+	  img.className="img-responsive center-block";
+	  
+	  
 	  var div1=document.getElementById('div1');
 
 	  while(div1.hasChildNodes())
