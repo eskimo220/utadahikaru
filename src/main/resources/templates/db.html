@@ -6,7 +6,7 @@
 
 </head>
 <body >
-	<form class="form-signin" action="/editsave" method="post"
+	<form class="form-horizontal" action="/editsave" method="post"
 		id="form_sign">
 
 		<div id="cover" class="cover" ></div>
@@ -16,23 +16,41 @@
 					class="form-control">
 			</div>
 			<table class="table table-striped table-bordered">
+			
 				<tr class="form-group">
-					<td><span id="nicknamespan">用户名 ：</span> <input type="text"
-						id="nickname" name="nickname" th:value="${user.nickname}"
+					<td>
+					<div class="form-group">
+					<label  id="nicknamespan" class="col-xs-1 control-label">用户名 ：</label > 
+					<div class="col-xs-11">
+				        <input type="text" id="nickname" name="nickname" th:value="${user.nickname}"
 						class="form-control" placeholder="nickname" autofocus readonly>
+					</div>
+					</div>
 					</td>
 				</tr>
+				
 				<tr class="form-group">
-					<td><span id="reauth-email">邮箱 ：</span> <input type="email"
-						id="email" name="email" th:value="${user.email}"
+					<td>
+					<div class="form-group">
+					<label id="reauth-email" class="col-xs-1 control-label">邮  箱 ：</label> 
+					<div class="col-xs-11">
+					<input type="email" id="email" name="email" th:value="${user.email}"
 						class="form-control" placeholder="Email address" readonly>
+				    </div>
+				    </div>
 					</td>
 				</tr>
 
 				<tr class="form-group">
-					<td><span>密码 ：</span> <input type="text" id="pswd" name="pswd"
-						th:value="${user.pswd}" class="form-control"
-						placeholder="Password" readonly></td>
+					<td>
+					<div class="form-group">
+					<label class="col-xs-1 control-label">密  码 ：</label>
+				    <div class="col-xs-11">
+					<input type="text" id="pswd" name="pswd" th:value="${user.pswd}" class="form-control"
+						placeholder="Password" readonly>
+				</div>
+				</div>
+					</td>
 				</tr>
 
 
@@ -40,11 +58,11 @@
 				<tr class="form-group" style="height: 125px">
 					<td>
                        <div class="col-xs-2">
-							<span id="sign-name">SIGN</span>
+							<label id="sign-name">SIGN:</label>
 						</div>
 						<div class="col-xs-3" style="height: 125px">
-							<button type="button" id="signname" class="btn-default"
-								style="height: 120px;">显示签名板</button>
+							<button type="button" id="signname" class="btn btn-default"
+								style="height: 120px;">签  名</button>
 						</div> <!-- 任意显示框在此 -->
 						<div class="col-xs-7">
 							<div id="div1" class="div1"></div>
@@ -53,19 +71,6 @@
 					
 				</tr>
 			</table>
-			<!-- <div class="row">
-			<div class="col-xs-2">
-							<span id="sign-name">SIGN </span>
-						</div>
-						<div class="col-xs-3" style="height: 125px">
-							<button type="button" id="signname" class="btn btn-default"
-								style="height: 120px;">显示签名板</button>
-						</div> 任意显示框在此
-						<div class="col-xs-7">
-							<div id="div1" class="div1"></div>
-							<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						</div>
-			</div> -->
 			
 		</div>
 
