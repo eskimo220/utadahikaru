@@ -333,6 +333,17 @@ public class UserVaildContreller {
 		
 		user.setPswd(pawDES);
 		model.addAttribute("user", user);
+		 
+       Imgsave imgsave = imgsaveMapper.selectByPrimaryKey(user.getNickname());
+        
+		if (imgsave != null) {
+			byte[] databyte = imgsave.getLongblob();
+
+			if (databyte != null) {
+				String data = Base64.encodeBase64String(databyte);
+				model.addAttribute("data", data);
+			}
+		}
 	    return "db";
 }
 
@@ -388,6 +399,9 @@ public class UserVaildContreller {
 		
 		Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
 	       
+		
+		
+		
 		if(submissions.length > 0)
 		{
 			MultipartFile file = submissions[0];
@@ -397,11 +411,22 @@ public class UserVaildContreller {
                 byte[] images = file.getBytes();                     
                 Imgsave imgsave = new Imgsave();
                 imgsave.setUsername(user.getNickname());
+                
+                imgsaveMapper.deleteByPrimaryKey(user.getNickname());
+                
                 imgsave.setLongblob(images);
+                
                 imgsaveMapper.insert(imgsave);
             }  
 		}
-	        return resultMap;
+		else
+		{
+			imgsaveMapper.deleteByPrimaryKey(user.getNickname());
+			
+		}
+		 resultMap.put("status", 200);
+         resultMap.put("message", "保存成功");
+         return resultMap;
 	}
 	
 	/**

@@ -60,7 +60,7 @@ function download2(dataURL, filename) {
 	  img.src = dataURL;
 	  img.id = "imgid";
 	  
-	  img.className="img-responsive";
+	  img.className="img-responsive ";
 	  
 	  
 	  var div1=document.getElementById('div1');
@@ -81,6 +81,7 @@ function closebtn(){
     {
         div1.removeChild(div1.firstChild);
     } 
+	signaturePad.clear();
 }
 
 

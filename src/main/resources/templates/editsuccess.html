@@ -20,9 +20,10 @@
 		
 <!-- <img id="img" th:src="@{showimg?nickname={nickname}(nickname=${user.nickname})}  "  alt="签名"> -->
 <!-- <img th:src="@{data:image/jpeg|png|gif;base64,{data}(data=${data})}"/> -->
-<img th:src="@{'data:image/jpeg|png|gif;base64,'+${data}}"/>
+<img class="img-responsive" th:src="@{'data:image/jpeg|png|gif;base64,'+${data}}"/>
 
-<Button id="showbtn" onclick="showimg()">显示签名</Button>
+<!-- <Button id="showbtn" onclick="showimg()">显示签名</Button> -->
+
 
 </body>
 </html>
