@@ -60,7 +60,7 @@ function download2(dataURL, filename) {
 	  img.src = dataURL;
 	  img.id = "imgid";
 	  
-	  img.className="img-responsive center-block";
+	  img.className="img-responsive";
 	  
 	  
 	  var div1=document.getElementById('div1');
@@ -70,7 +70,7 @@ function download2(dataURL, filename) {
 	        div1.removeChild(div1.firstChild);
 	    } 
       div1.appendChild(img);
-      $(img).after('<button type="button" class="close" onclick="closebtn()";><span aria-hidden="true">&times;</span></button>');
+      $(img).after('<button type="button" class="close imgdelete" onclick="closebtn()";><span aria-hidden="true">&times;</span></button>');
 	  $(".signature-pad-parent").hide();
   
 	}

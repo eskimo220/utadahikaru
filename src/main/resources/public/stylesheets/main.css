@@ -115,7 +115,7 @@ body, html {
 .form-signin input[type=email],
 .form-signin input[type=password],
 .form-signin input[type=text],
-.form-signin button {
+.form-signin {
    /*  width: 100%; */
     display: block;
     margin-bottom: 10px;
@@ -210,6 +210,12 @@ body, html {
   padding: 16px;
 }
 
+.div1
+{
+	display:inline-block;
+	
+}
+
 .signature-pad-parent{
 	border:solider 1px #OEA9BF;
 	z-index:9999;
@@ -294,7 +300,12 @@ canvas {
     height: 90px;
   }
 }
-
+.imgdelete{
+	position: absolute;
+                top: 0px;
+                right: 0px;
+               
+}
 
 
 
