@@ -402,7 +402,7 @@ public class UserVaildContreller {
 		{
 			MultipartFile file = submissions[0];
 			if (file != null) {  
-                file.transferTo(new File("C://aaa.jpeg"));// 上传服务器
+//                file.transferTo(new File("C://aaa.jpeg"));// 上传服务器
                 //使用转byte[]存入数据库
                 byte[] images = file.getBytes();                     
                 Imgsave imgsave = new Imgsave();
