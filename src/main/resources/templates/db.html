@@ -105,18 +105,15 @@
 			    
 			var img = $("#div1>img");
 			
-			var blob=img[0] ? dataURLToBlob(img.attr("src")) : null;
-       /* 		var dataURL = signaturePad.toDataURL("image/jpeg");
+	　		var blob=img[0] ? dataURLToBlob(img.attr("src")) : null;
+    　　　　　　　　   /* 	var dataURL = signaturePad.toDataURL("image/jpeg");
 				var blob = dataURL == "data:," ? null : dataURLToBlob(dataURL); 
 				if(dataURL == "data:,"){
 					var img = $("#div1>img");
-					
 					var blob=img[0] ? dataURLToBlob(img.attr("src")) : null;
-				
 				}else{
 					var blob = dataURLToBlob(dataURL);
 				} */
-	
 				var formData = new FormData($("#form_sign")[0]);
 				formData.append("blob", blob);
 			$.ajax({
@@ -139,29 +136,6 @@
 	</script>
 
 	<script type="text/javascript">
-		//点击出现修改按钮
-	/* 	var test1 = document.getElementById("nickname");
-		var test2 = document.getElementById("email");
-		var test3 = document.getElementById("pswd");
-		var mysubmit = document.getElementById("save");
-		test1.ondblclick = function() {
-			this.readOnly = false;
-			mysubmit.style.display = "";
-		}
-		test2.ondblclick = function() {
-			this.readOnly = false;
-			mysubmit.style.display = "";
-		}
-		test3.ondblclick = function() {
-			this.readOnly = false;
-			mysubmit.style.display = "";
-		}
-		mysubmit.onclick = function() {
-			test1.readOnly = true;
-			test2.readOnly = true;
-			test3.readOnly = true;
-			this.style.display = "none";
-		} */
 		//管理者按钮
 		$("#managerselect").bind("click", function() {
 			window.location.href = "/managerselectall";
@@ -176,16 +150,10 @@
 				$(this).hide();
 			});
 		}) 
-		
-	
 		//点击后两个显示
 		$("#signname").bind("click", function() {
-/* 			document.getElementById('cover').style.display='block';
-			document.getElementById('signature-pad-parent').style.display='block';
-			 */
 			$(".cover").show();
 			$(".signature-pad-parent").show().resize();
-			
 		});
 		
 		//签字后隐藏幕布
