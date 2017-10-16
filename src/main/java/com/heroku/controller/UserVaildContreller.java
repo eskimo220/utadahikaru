@@ -418,7 +418,6 @@ public class UserVaildContreller {
 		else
 		{
 			//如果有图片就存原来的，如果是×掉的情况就得删原来的
-		
 			imgsaveMapper.deleteByPrimaryKey(user.getNickname());
 		}
 		 resultMap.put("status", 200);
