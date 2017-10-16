@@ -18,7 +18,7 @@
 			<table class="table table-striped table-bordered">
 				<tr>
 					<td><label id="nicknamespan"
-						class="col-xs-3  text-left">用户名 </label>
+						class="col-xs-3  text-left">ユーザー </label>
 						<div class="col-xs-9">
 							<input type="text" id="nickname" name="nickname"
 								th:value="${user.nickname}" class="form-control"
@@ -27,7 +27,7 @@
 				</tr>
 
 				<tr>
-					<td><label id="reauth-email" class="col-xs-3 ">邮 箱 </label>
+					<td><label id="reauth-email" class="col-xs-3 ">メールアドレス</label>
 						<div class="col-xs-9">
 							<input type="email" id="email" name="email"
 								th:value="${user.email}" class="form-control"
@@ -36,7 +36,7 @@
 				</tr>
 
 				<tr>
-					<td><label class="col-xs-3 ">密 码 </label>
+					<td><label class="col-xs-3 ">パスワード</label>
 						<div class="col-xs-9">
 							<input type="text" id="pswd" name="pswd" th:value="${user.pswd}"
 								class="form-control" placeholder="Password" readonly>
@@ -52,12 +52,12 @@
 						</div>
 						<div class="col-xs-3" style="height: 125px">
 							<button type="button" id="signname" class="btn btn-default"
-								style="height: 125px;">签 名</button>
+								style="height: 125px;">サイン</button>
 						</div> <!-- 任意显示框在此 -->
 						<div class="col-xs-7">
 							<div id="div1" class="div1">
 							<img class="img-responsive" th:if="${data}" th:src="@{'data:image/jpeg|png|gif;base64,'+${data}}"/>
-							<button type="button" th:if="${data}" class="close imgdelete" onclick="closebtn()";><span aria-hidden="true">&times;</span></button>
+							<button type="button" th:if="${data}" class="close imgdelete" onclick="closebtn()"><span aria-hidden="true">&times;</span></button>
 							</div>
 						</div>
 					</td>
@@ -82,30 +82,41 @@
           <button type="button" class="button" data-action="change-color">Change color</button>
           <button type="button" class="button" data-action="undo">Undo</button>
           <button id="btnplayno" type="button" class="button save" data-action="save-img">签字</button> -->
-							<a id="btnclear" data-action="clear">Clear</a> <a id="btnundo"
-								data-action="undo">Undo</a> <a id="btnplayno"
-								data-action="save-img">SignName</a>
+							<a id="btnclear" data-action="clear">クリア</a> <a id="btnundo"
+								data-action="undo">元に戻る</a> <a id="btnplayno"
+								data-action="save-img">確認</a>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<table class="table">
-		<tr>
-		<td>
+		<div class="container">
+
 		<button class="btn btn-primary" id="save" type="button">保存</button>
-		</td>
-		</tr>
-		</table>
-		
+       <!-- <a href="/logout"><span class="glyphicon glyphicon-cloud"></span> Log out</a> -->
+        <button class="btn btn-warning" id="layout" type="button">ログアウト</button>
+		</div>
 		<button type="button" id="managerselect"
 			class="btn btn-lg btn-primary btn-block btn-signin" shiro:hasRole="1">管理用户信息</button>
 
 	</form>
 	<script type="text/javascript">
 		$("#save").bind("click", function() {
-			var dataURL = signaturePad.toDataURL("image/jpeg");
-				var blob = dataURL == "data:," ? null : dataURLToBlob(dataURL);
+			    
+			var img = $("#div1>img");
+			
+			var blob=img[0] ? dataURLToBlob(img.attr("src")) : null;
+       /* 		var dataURL = signaturePad.toDataURL("image/jpeg");
+				var blob = dataURL == "data:," ? null : dataURLToBlob(dataURL); 
+				if(dataURL == "data:,"){
+					var img = $("#div1>img");
+					
+					var blob=img[0] ? dataURLToBlob(img.attr("src")) : null;
+				
+				}else{
+					var blob = dataURLToBlob(dataURL);
+				} */
+	
 				var formData = new FormData($("#form_sign")[0]);
 				formData.append("blob", blob);
 			$.ajax({
@@ -118,7 +129,6 @@
 				processData : false,
 				success : function(data) {
 					alert(data.message);
-					
 				},
 				error : function(returndata) {
 					alert("error");
@@ -182,6 +192,12 @@
 		$("#btnplayno").bind("click", function() {
 			$(".cover").hide();
 		});
+		//Layout
+		$("#layout").bind("click", function() {
+			window.location.href = "/logout";
+		});
+		
+		
 	</script>
 	<script src="js/signature_pad.js"></script>
 	<script src="js/app.js"></script>

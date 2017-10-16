@@ -398,11 +398,7 @@ public class UserVaildContreller {
 	public @ResponseBody Map<String,Object> jpgsave(@RequestParam("blob") MultipartFile[] submissions,UUser user) throws IOException{
 		
 		Map<String, Object> resultMap = new LinkedHashMap<String, Object>();
-	       
-		
-		
-		
-		if(submissions.length > 0)
+		if(submissions.length >0)
 		{
 			MultipartFile file = submissions[0];
 			if (file != null) {  
@@ -421,8 +417,9 @@ public class UserVaildContreller {
 		}
 		else
 		{
+			//如果有图片就存原来的，如果是×掉的情况就得删原来的
+		
 			imgsaveMapper.deleteByPrimaryKey(user.getNickname());
-			
 		}
 		 resultMap.put("status", 200);
          resultMap.put("message", "保存成功");
