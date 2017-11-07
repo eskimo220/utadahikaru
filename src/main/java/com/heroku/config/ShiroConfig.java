@@ -72,8 +72,22 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/managerselectall", "perms[1]");
         filterChainDefinitionMap.put("/managerselect", "perms[1]");
         filterChainDefinitionMap.put("/showimg", "anon");
-
+        filterChainDefinitionMap.put("/tagadd", "anon");
+        filterChainDefinitionMap.put("/taginsert", "anon");
+        filterChainDefinitionMap.put("/a_select", "anon");
+        filterChainDefinitionMap.put("/tagshow1", "anon");
+        filterChainDefinitionMap.put("/index", "anon");
+        filterChainDefinitionMap.put("/Dashboard", "anon");
+        filterChainDefinitionMap.put("/selectpa", "anon");
+        filterChainDefinitionMap.put("/tagsave", "anon");
+        filterChainDefinitionMap.put("/tagsall", "anon");
+        filterChainDefinitionMap.put("/selecttag", "anon");
+        filterChainDefinitionMap.put("/tagsupdate", "anon");
+        filterChainDefinitionMap.put("/ajaxsave", "anon");
+      //filterChainDefinitionMap.put("/failselecttag", "anon");
         
+        filterChainDefinitionMap.put("/tagshow", "anon");
+        filterChainDefinitionMap.put("/tagshowinsert", "anon");
         filterChainDefinitionMap.put("/jpgsave", "anon");
         // 配置退出过滤器,其中的具体的退出代码Shiro已经替我们实现了
         filterChainDefinitionMap.put("/logout", "logout");

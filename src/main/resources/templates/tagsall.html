@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+	th:replace="~{fragments/dash :: dash (~{::body},'tagshow')}">
+<head>
+
+</head>
+<body>
+	<form id="tagshowform" action="tagsave" class="form-horizontal" method="POST">
+		<table class="table table-responsive-sm table-hover table-outline mb-0" id="user4_1_tbody">
+		<tr class="input-group-addon"><td><a href="/tagadd">新建</a></td></tr>
+			<tr class="input-group-addon"><td class="col-2">序号</td><td class="col-2">点检项目名</td><td class="col-2">操作</td>
+			<td class="col-2">修改</td>
+			<td class="col-2">最新修改时间</td>
+			</tr>
+	        <tr th:each="alltag,index:${allstaglist}" class="input-group-addon">
+			<td class="col-2"><span th:text="@{{i}(i=${index.index+1})}"></span></td>
+			<td class="col-2"><span  th:text="${alltag.alltagsname}" ></span></td>
+			<td class="col-2"><a href="#" class="btn" onclick="ck(this)" >查看</a></td>
+			<td class="col-2"><a href="#" class="btn" onclick="upmodel(this)" >模板修改</a></td>
+			<td class="col-2"><input style="border:0px;background-color:transparent" readonly="readonly" type="text" th:value="${alltag.uptime}" /></td>
+			</tr>
+		</table>
+	</form>
+
+<script type="text/javascript">
+function ck(aaa){
+	var ss = $(aaa).parent().prev().find("span")[0];
+	var e = $(ss).text();
+	 window.open("/selecttag?proname="+ e,"_self");
+}
+//更新版本时间
+function upmodel(bbb){
+	var b = $(bbb).parent().parent().find("span")[1];
+	var e = $(b).text();
+	window.open("/tagsupdate?proname="+e,"_self");
+}
+
+</script>
+</body>
+</html>

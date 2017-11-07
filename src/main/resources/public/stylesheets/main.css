@@ -303,3 +303,27 @@ canvas {
     vertical-align: middle;
     float: none;
 }
+
+.col-center-block {  
+    float: none;  
+    display: block;  
+    margin-left: auto;  
+    margin-right: auto; 
+     margin-top: 15%; 
+}  
+.gg{
+	 display: none;  
+	
+}
+.leftcc{
+	padding-right: 15px;
+	padding-left: 15px;
+	margin-left: auto;
+}
+
+.fieldError {
+  background-color: #ff8080;
+}
+.ck{
+	
+}

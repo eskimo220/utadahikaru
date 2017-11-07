@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+	th:replace="~{fragments/dash :: dash (~{::body},'tagshow')}">
+<head>
+
+</head>
+<body>
+	<label>点检项目名 :</label><input style="border:0px;background-color:transparent" type="text" th:value="${proname}" id="proname"/>
+<span style="display: none" th:text="${count}" id="countnum"></span>
+
+	<div>
+		<form id="tagshowform" action="/tagsave" class="form-horizontal" method="POST">
+			<input type="button" value="保存" class="btn btn-primary" id="ajaxsave"/>
+			<table class="table table-responsive-sm table-hover table-outline mb-0" id="user4_1_tbody">
+				
+		<tr th:each="atag2,index:${atagshowlist}" class="input-group-addon">
+		
+				<td class="col-2"><span> 项目名 :</span><input id="alltagsid" type="text" style="display: none" th:value="${atag2.alltagsid}" th:name="@{btag[{i}].alltagsid(i=${index.index})}"/></td>
+				
+		     	<td class="col-2 ">
+		     	<input readonly="readonly" style="border:0px;background-color:transparent" type="text" th:name="@{btag[{i}].bTagname(i=${index.index})}" th:value="${atag2.tagname}"/>
+		     	</td>
+				<td class="col-md-2"><span> 项目值 :</span></td>
+<!-- text -->
+					<td th:if="${atag2.tagtype=='text'}" class="col-md-2">
+					<input type="text" th:name="@{btag[{i}].bTvalue(i=${index.index})}" th:value="${atag2.tagvalue}"/>
+					<input type="text" th:name="@{btag[{i}].bType(i=${index.index})}" value="text" style="display: none;"/></td>
+<!-- 下拉框 -->
+					<td th:if="${atag2.tagtype=='select'}" class="col-md-2 ">
+					<select th:name="@{btag[{i}].bSvalue(i=${index.index})}" class="wse">
+						<option th:each="tag : ${atag2.tagvalues}" th:value="${tag}" th:text="${tag}"></option>
+					</select>
+					<input type="text" th:name="@{btag[{i}].bType(i=${index.index})}" value="select" style="display: none;"/></td>
+<!-- signname -->
+					<td th:if="${atag2.tagtype=='signname'}" class="col-md-7">
+						<!-- 签名板 -->
+						<div id="signature-pad-parent" class="signature-pad-parent" style="display: none;">
+							<div id="signature-pad" class="signature-pad text-center">
+								<div class="signature-pad--body">
+									<canvas></canvas>
+								</div>
+								<div class="signature-pad--footer">
+
+									<div class="signature-pad--actions">
+										<div>
+											<a id="btnclear" data-action="clear">クリア</a> <a id="btnundo"
+												data-action="undo">元に戻る</a> <a id="btnplayno"
+												data-action="save-img">確認</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div> 
+						<div id="cover" class="cover"></div>
+
+						<div class="col-3">
+							<button type="button" th:id="@{signname[{i}](i=${index.index})}" class="btn btn-default"
+								style="height: 125px;">サイン</button>
+						</div>
+						
+						<div id="div1" class="div1 col-7" >
+						
+								<button type="button" th:if="${data}" class="close imgdelete"
+									onclick="closebtn()">
+									<span aria-hidden="true">&times;</span>
+								</button>
+						</div>
+					</td>
+					<td><input type="text" id="lastuptime" style="display: none" th:value="${atag2.lastuptime}" name="lastuptime"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+<script type="text/javascript" src="js/bootstrap-paginator.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			//点击幕布隐藏
+			$(".cover").click(function() {
+				$(".signature-pad-parent").hide();
+				$(".cover").hide();
+			});
+		})
+		
+		//绑定动态id使每个按钮点击都出签字
+		$(":button[id^=signname]").bind("click", function() {
+			$(".cover").show();
+			$(".signature-pad-parent").show().resize();
+		});
+		//签字后隐藏幕布
+		$("#btnplayno").bind("click", function() {
+			$(".cover").hide();
+		});
+
+		//验证模板是否最新
+		$("#ajaxsave").bind("click",function(){
+			$.ajax({
+				type : 'POST',
+				url : '/ajaxsave',
+			
+				data : {
+					"alltagsid" : $("#alltagsid").val(),
+					"lastuptime" : $("#lastuptime").val().toString()
+				},
+				success : function(data) {
+					alert(data.message);
+					if(data.status == "200"){
+						$("#tagshowform").submit();
+					}else{
+						window.open("/tagsall","_self");
+					}
+				},
+			});
+		})
+	</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+	th:replace="~{fragments/dash :: dash (~{::body},'tagshow')}">
+<head>
+
+</head>
+<body>
+    <div>
+	<input type="text" th:value="${id}" style="display:none" name="id" id="tid"/>
+	<input type="text" placeholder="请输入项目名" name="$"/>
+	<input type="button" value="查询" id="cx"/>
+	</div >
+<span style="display: none" th:text="${count}" id="countnum"></span>
+	<div>
+		<form id="tagshowform" action="tagshowinsert" class="form-horizontal" method="POST">
+		<!-- 	<input type="submit" value="保存" class="btn btn-primary" /> -->
+			<table class="table table-responsive-sm table-hover table-outline mb-0" >
+				<tbody id="user4_1_tbody"></tbody>
+		
+			</table>
+<div>
+    <ul id="asd"> 
+    </ul>
+   <span id="user4_1_span"></span>
+</div>
+		</form>
+	</div>
+
+<script type='text/javascript'>
+$("cx").on("click",function(){
+	
+})
+	$(function() {
+		var num1 = $("#countnum").text();
+		page(1, 4, num1);
+	});
+
+	 function page(page, count, num1) {
+			var num;
+			if (num1 % 4 == 0) {
+				num = num1 / 4;
+			} else {
+				num = (num1 / 4) + 1;
+			}
+			//页标
+			
+			//初始化所需数据
+			var options = {
+				bootstrapMajorVersion : 3, //版本号。3代表的是第三版本
+				currentPage : page, //当前页数
+				numberOfPages : 5, //显示页码数标个数
+				totalPages : num, //总共的数据所需要的总页数
+				alignment : "right",
+				onPageClicked : function(e, originalEvent, type, page) {
+					var a = JSON.stringify({
+						page : page,
+						count : count
+					});
+					$.ajax({
+						type : "POST",
+						url : "/selectpa?id="+$("#tid").val(),
+						headers : {
+							'Content-Type' : 'application/json;charset=utf-8'
+						},
+						data : a,
+						success : function(data) {
+							if (data.status == "200")  {
+								createtable(data.btag2list, page, count,
+										data.count);
+							} 
+						}
+					});
+				}
+			};
+			$('#asd').bootstrapPaginator(options); //进行初始化
+
+			$(".active>a").trigger("click");
+		}
+
+ 	 function createtable(btag2list, page, count, sumcount) {
+			var pagenum = (page - 1) * count;
+			var tables = $('#user4_1_tbody');
+			var num1 = $("#countnum").text();
+
+			var tr = tables.find("tr");
+			$("#user4_1_span").text("共" + sumcount + "条,当前第" + page + "页");
+			$.each(tr, function(a, b) {
+				$(b).remove();
+			})
+			var addtrone=$('<tr class="input-group-addon"><td class="col-md-2">序号</td><td class="col-md-2">项目名</td><td class="col-md-2">项目值</td></tr>');
+			addtrone.appendTo(tables); 
+			$.each(
+					btag2list,
+							function(index, obj) {
+								var num = pagenum + index + 1;
+								//如果是text行
+							if(obj.bType=="text"){
+									var addtr =$('<tr class="input-group-addon"><td class="col-md-2">'+ num +'</td>'
+											+'<td class="col-md-2">'+ obj.bTagname + '</td>'
+											+'<td class="col-md-2">'+obj.bTvalue+'</td></tr>');
+									 addtr.appendTo(tables);	
+									 //下拉框
+							}else if(obj.bType=="select"){
+								var addtr =$('<tr class="input-group-addon"><td class="col-md-2">'+ num +'</td>'
+										+'<td class="col-md-2">'+ obj.bTagname + '</td>'
+										+'<td class="col-md-2">'+obj.bSvalue+'</td></tr>');
+								 addtr.appendTo(tables);
+								 //图片
+							}else{
+								var addtr =$('<tr class="input-group-addon"><td class="col-md-2">'+ num +'</td>'
+										+'<td class="col-md-2">'+ obj.bTagname + '</td>'
+									/* 	+'<img class="img-responsive"src="@{'data:image/jpeg|png|gif;base64,'+${data}}"/>*/+'<td class="col-md-2">'+obj.bSvalue+'</td></tr>'); 
+								 addtr.appendTo(tables);
+							}
+					});
+		} 
+	</script>
+	
+	
+</body>
+</html>

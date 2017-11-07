@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+	th:replace="~{fragments/dash :: dash (~{::body},'tagadd')}">
+<head>
+</head>
+<body>
+	<div>
+		<p th:if="${validationError}" th:text="${validationError}">validation
+			error</p>
+		<form id="tagform" th:action="@{/taginsert}" th:object="${ATag}"
+			class="form-horizontal " method="post">
+			<div></div>
+			<div>
+			<input type="text" placeholder="请输入项目名" th:name="alltagsname">
+				<button class="btn btn-primary" id="addtag" type="button">添加</button>
+				<button class="btn btn-sm btn-danger" id="deleteTable" type="button">
+					<i class="fa fa-ban"></i>删除
+				</button>
+				<button type="submit" id="savebtn" class="btn btn-sm btn-primary">
+					<i class="fa fa-dot-circle-o"></i>保存
+				</button>
+				<hr>
+				<table id="contag" class="table table-responsive-sm table-hover table-outline mb-0">
+					<tr>
+						<td><select class="gg form-control" style="width: 100px">
+								<option selected="selected" value="" disabled>請選擇</option>
+								<option th:each="aselect : ${aselectlist}"
+									th:value="${aselect.aSelectName}"
+									th:text="${aselect.aSelectName}"></option>
+						</select></td>
+					</tr>
+					<tr class="input-group-addon" th:if="${atag}" th:each="atagtr,index:${atag}" >
+						<td><input type="checkbox" name="checkname"
+							class="input-group-addon"></td>
+						<td><span> 项目名 : </span></td>
+
+						<td><input type="text" th:value="${atagtr.tagname}" 
+							placeholder="请输入项目名" class="ck col-md-12 form-control"
+							th:name="@{atag[{i}].tagname(i=${index.index})}" /> 
+							<!-- 报错 -->
+							<span class="error" th:if="${#fields.hasErrors('atag[__${index.index}__].tagname')}" th:text="${errorMessage}" style="color: red"></span></td>
+
+						<td><span>类型: </span></td>
+						<td><select id="atag_id" class="col-md-12 form-control"
+							th:name="@{atag[{i}].tagtype(i=${index.index})}">
+								<option value="text" th:selected="${atagtr.tagtype=='text'}">text</option>
+								<option value="select" th:selected="${atagtr.tagtype=='select'}">select</option>
+								<option value="signname"
+									th:selected="${atagtr.tagtype=='signname'}">signname</option>
+						</select></td>
+						<td><select th:if="${atagtr.tagvalue}" class="form-control"
+							style="width: 100px">
+								<option selected="selected" th:value="${atagtr.tagvalue}"
+									th:text="${atagtr.tagvalue}"></option>
+								<option th:each="aselect : ${aselectlist}"
+									th:value="${aselect.aSelectName}"
+									th:text="${aselect.aSelectName}"></option>
+						</select></td>
+					</tr>
+				</table>
+			</div>
+			
+		</form>
+	</div>
+	<script type="text/javascript">
+	
+	var ii=0;
+		$(function() {
+       //1	动态添加验证			
+			 var object={};
+				$(":text[name$=tagname]").each(function(){
+					object[this.name]={
+							required : true
+			                   
+			               };
+				}); 
+			
+			 $("#tagform").validate({
+					focusInvalid : false, //当为false时，验证无效时，没有焦点响应  
+					onkeyup : false,
+					submitHandler : function(form) { //表单提交句柄,为一回调函数，带一个参数：form   
+
+						return this.valid();
+					},
+					rules : object,
+					 messages : {}, 
+					   errorPlacement : function(label, element) {
+						  label.addClass('invalid-feedback');
+					        label.insertAfter(element);
+					}, 
+					 wrapper: 'span'
+				});
+          //2 动态添加验证 需要在form validate方法后面
+				/*  $("#contag tr ").each(function(){
+						var ss= $(this).find("td").find(":text");
+						if (ss.length!=0){
+							ss.rules("add", {
+								rangelength:[3,10]
+							});  
+						}
+					});  */
+			//于table中的下拉框绑事件	
+			$("#contag").on("change", "select[id='atag_id']", function() {
+				var gg = $(".gg");
+				return function() {
+					if ($(this).val() == 'select') {
+						//获取当前行号赋予value
+						var g = gg.clone().attr("name", "atag[0].tagvalue");
+						$(this).parent().next().append(g);
+						g.fadeIn(300);
+					} else {
+						$(this).parent().next().empty();
+					}
+				}
+			}());
+           //添加一行及规则
+			$("#addtag").on("click",function() {
+								var append = $([
+										'<tr class="input-group-addon">',
+										'<td><input type="checkbox" name="checkname" /></td>',
+										'<td><span> 项目名 :</span></td>',
+										'<td><input type="text" placeholder="请输入项目名" class="col-md-12 form-control ck" name="atag['+ii+'].tagname" ></td>',
+
+										'<td><span> 类型:</span></td>',
+										'<td><select id = "atag_id" class="col-md-12 form-control" name="atag[0].tagtype">',
+										'<option value="text">text</option>',
+										'<option value="select">select</option>',
+										'<option value="signname">signname</option>',
+										'</select></td>', '<td></td>', '</tr>' ]
+										.join(""));
+
+								$("#contag>tbody").append(append);
+
+								  append.find(":text").rules("add", {
+									required : true
+									
+								});  
+									ii=ii+1;
+							});
+		
+			//单选框删除
+			$("#deleteTable").click(function() {
+				var check = document.getElementsByName('checkname');
+
+				for (var i = 0; i < check.length; i++) {
+					if (check[i].checked) {
+						document.getElementById('contag').deleteRow(i + 1);
+						i--;
+					}
+				}
+			})
+	      //提交按钮将每行标签下标重新根据行号o定义排序
+			$("#savebtn").bind(
+					"click",
+					function() {
+						$("#contag").find("tr").each(
+								function(o) {
+									$(this).find(":text, select").each(
+											function() {
+												this.name = this.name.replace(
+														/(.*\[)[0-9]*(\].*)/,
+														"$1" + (o - 1) + "$2");
+											});
+								});
+					});
+		});
+		$(".ck").focus(function(){
+	    	 $(this).next().empty();
+	     });
+	</script>
+</body>
+</html>

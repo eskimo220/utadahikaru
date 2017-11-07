@@ -36,6 +36,9 @@
 			<!-- /form -->
 			<a href="/forgotpwd" class="forgot-password"> Forgot the password? </a>
 			<a href="/add" class="Sign-up"> Sign Up? </a>
+			
+           <a href="/tagadd" class="Sign-up"> Tag </a>	
+			
 		</div>
 		<!-- /card-container -->
 	</div>
@@ -86,7 +89,6 @@
                             rememberMe : $("#rememberMe").is(':checked')
 						}),
 						success : function(data) {
-					
 							alert(data.message);
                             data.status == "200" && window.open("/db?email="+$("#inputEmail").val(), "_self")
 						}
